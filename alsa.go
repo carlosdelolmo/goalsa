@@ -222,14 +222,14 @@ func (d *device) createDevice(deviceName string, channels int, format Format, ra
 
 // Close closes a device and frees the resources associated with it.
 func (d *device) Close() {
+	if d.readerThread != nil {
+		C.reader_thread_stop(d.readerThread)
+		d.readerThread = nil
+	}
 	if d.h != nil {
 		C.snd_pcm_drop(d.h)
 		C.snd_pcm_close(d.h)
 		d.h = nil
-	}
-	if d.readerThread != nil {
-		C.reader_thread_stop(d.readerThread)
-		d.readerThread = nil
 	}
 	runtime.SetFinalizer(d, nil)
 }
